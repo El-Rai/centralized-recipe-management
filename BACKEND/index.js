@@ -2,6 +2,8 @@
 const express = require("express");
 const cors = require("cors");
 const {Recipe, sequelize} = require("./models/Recipe");
+const { Template } = require("./models/Template");
+
 
 const app = express();
 const port = 5000;
@@ -90,9 +92,50 @@ app.get("/recipe/:id/section/:machine", async (req, res) => {
   res.json(recipe[machine]);
 });
 
+// For Template Designer
+// Create a new template
+app.post("/templates", async (req, res) => {
+  try {
+    const { name, fields } = req.body;
+    if (!name || !fields) {
+      return res.status(400).json({ error: "Name and fields are required" });
+    }
+
+    const template = await Template.create({ name, fields });
+    res.status(201).json(template);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to save template" });
+  }
+});
+
+// Get all templates
+app.get("/templates", async (req, res) => {
+  try {
+    const templates = await Template.findAll();
+    res.json(templates);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to load templates" });
+  }
+});
+
+// Get one template by ID
+app.get("/templates/:id", async (req, res) => {
+  try {
+    const template = await Template.findByPk(req.params.id);
+    if (!template) return res.status(404).json({ error: "Not found" });
+    res.json(template);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch template" });
+  }
+});
+
+
 
 sequelize.sync().then(() => {
-  console.log("Database synced");
+  console.log("Database synced (recipes + templates)");
 });
 
 

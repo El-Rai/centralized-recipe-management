@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App';
 import RecipeForm from './RecipeForm';
 import EditRecipe from './EditRecipe';
+import TemplateDesigner from './TemplateDesigner';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -13,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/" element={<App />} />
         <Route path="/new" element={<RecipeForm />} />
         <Route path="/edit/:id" element={<EditRecipe />} />
+        <Route path="/template-designer" element={<TemplateDesigner />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
