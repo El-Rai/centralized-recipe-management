@@ -52,6 +52,31 @@ app.get("/recipe/:id", async (req, res) => {
   }
 });
 
+app.put("/recipe/:id", async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id);
+    if (!recipe) return res.status(404).json({ error: "Not found" });
+
+    await recipe.update(req.body);
+    res.json({ message: "Recipe updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
+app.delete("/recipe/:id", async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id);
+    if (!recipe) return res.status(404).json({ error: "Not found" });
+
+    await recipe.destroy();
+    res.json({ message: "Recipe deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Delete failed" });
+  }
+});
 
 
 
