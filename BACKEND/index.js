@@ -1,12 +1,15 @@
 // backend/index.js
 const express = require("express");
+const cors = require("cors");
 
 
 const app = express();
 const port = 5000;
 
 // Middleware to parse JSON requests
+app.use(cors());
 app.use(express.json());
+
 
 // In-memory store for recipes
 let recipes = {};
@@ -23,6 +26,19 @@ app.post("/recipe", (req, res) => {
 
   console.log(`Saved recipe: ${recipe.id}`);
   res.status(201).json({ message: "Recipe saved successfully" });
+});
+
+// Get all recipes
+app.get("/recipes", (req, res) => {
+  const allRecipes = Object.entries(recipes).map(([id, recipe]) => ({
+    id,
+    name: recipe.name,
+    waterPrep: recipe.waterPrep,
+    mixing: recipe.mixing,
+    bottling: recipe.bottling,
+  }));
+
+  res.json(allRecipes);
 });
 
 
