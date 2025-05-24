@@ -148,6 +148,7 @@ app.post("/dispatch/:id", async (req, res) => {
     if (!recipe) return res.status(404).json({ error: "Recipe not found" });
 
     const data = recipe.data;
+    console.log("Recipe data keys:", Object.keys(recipe.data));
 
     for (const machineName of Object.keys(data)) {
       const values = data[machineName];

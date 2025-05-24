@@ -1,23 +1,23 @@
 const machineNodeMap = {
-  babyMaker: {
-    endpoint: "opc.tcp://localhost:4840",
+  babymaker: {
+    endpoint: "opc.tcp://Abdelkarims-MacBook-Pro.local:4840/babymaker",
     nodes: {
-      rotations: "ns=1;s=BabyMaker.Rotations",
-      material: "ns=1;s=BabyMaker.Material"
+      rotations: "ns=1;s=babymaker.Rotations",
+      material: "ns=1;s=babymaker.Material"
     }
   },
-  controlPlug: {
-    endpoint: "opc.tcp://localhost:4841",
+  controlplug: {
+    endpoint: "opc.tcp://Abdelkarims-MacBook-Pro.local:4841/controlplug",
     nodes: {
-      voltage: "ns=1;s=ControlPlug.Voltage",
-      tolerance: "ns=1;s=ControlPlug.Tolerance"
+      voltage: "ns=1;s=controlplug.Voltage",
+      tolerance: "ns=1;s=controlplug.Tolerance"
     }
   },
   robot: {
-    endpoint: "opc.tcp://localhost:4842",
+    endpoint: "opc.tcp://Abdelkarims-MacBook-Pro.local:4842/robot",
     nodes: {
-      movementSpeed: "ns=1;s=Robot.MovementSpeed",
-      gripForce: "ns=1;s=Robot.GripForce"
+      movementSpeed: "ns=1;s=robot.MovementSpeed",
+      gripForce: "ns=1;s=robot.GripForce"
     }
   }
 };
