@@ -3,6 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const {Recipe, sequelize} = require("./models/Recipe");
 const { Template } = require("./models/Template");
+const machineNodeMap = require("./machineConfig");
+const {sendToMachine} = require("./opcua");
 
 
 const app = express();
@@ -138,6 +140,33 @@ app.get("/templates/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch template" });
   }
 });
+
+//dispatching routes
+app.post("/dispatch/:id", async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id);
+    if (!recipe) return res.status(404).json({ error: "Recipe not found" });
+
+    const data = recipe.data;
+
+    for (const machineName of Object.keys(data)) {
+      const values = data[machineName];
+      const config = machineNodeMap[machineName];
+      if (!config) {
+        console.warn(`⚠️ No config for machine: ${machineName}`);
+        continue;
+      }
+
+      await sendToMachine(machineName, values, config);
+    }
+
+    res.json({ message: "Recipe dispatched to machines." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Dispatch failed" });
+  }
+});
+
 
 
 
