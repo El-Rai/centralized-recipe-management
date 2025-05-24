@@ -1,25 +1,24 @@
 const { Sequelize, DataTypes } = require("sequelize");
+
+// Reuse the same DB connection
 const sequelize = new Sequelize({
   dialect: "sqlite",
-  storage: "recipes.db" // Will create this file in the root
+  storage: "recipes.db"
 });
 
 const Recipe = sequelize.define("Recipe", {
   id: {
     type: DataTypes.STRING,
-    primaryKey: true
+    primaryKey: true,
   },
   name: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
   },
-  waterPrep: {
-    type: DataTypes.JSON
+  templateId: {
+    type: DataTypes.INTEGER,
   },
-  mixing: {
-    type: DataTypes.JSON
-  },
-  bottling: {
-    type: DataTypes.JSON
+  data: {
+    type: DataTypes.JSON,
   }
 });
 

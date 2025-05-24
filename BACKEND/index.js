@@ -19,16 +19,19 @@ let recipes = {};
 // Endpoint to store a new recipe
 app.post("/recipe", async (req, res) => {
   try {
-    const { id, name, waterPrep, mixing, bottling } = req.body;
-    if (!id) return res.status(400).json({ error: "ID is required" });
+    const { id, name, templateId, data } = req.body;
+    if (!id || !templateId || !data) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
 
-    await Recipe.create({ id, name, waterPrep, mixing, bottling });
+    await Recipe.create({ id, name, templateId, data });
     res.status(201).json({ message: "Recipe saved successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to save recipe" });
   }
 });
+
 
 
 // Get all recipes

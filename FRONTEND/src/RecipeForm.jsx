@@ -1,137 +1,144 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-function App() {
-  const [recipe, setRecipe] = useState({
-    id: '',
-    name: '',
-    waterPrep: {
-      waterVolume: '',
-      preheatTemp: ''
-    },
-    mixing: {
-      sugarMass: '',
-      mixTime: ''
-    },
-    bottling: {
-      bottleSize: ''
-    }
-  });
+function RecipeForm() {
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [recipeId, setRecipeId] = useState("");
+  const [recipeName, setRecipeName] = useState("");
+  const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
 
-  const handleChange = (e, section, field) => {
-    const value = e.target.value;
+  useEffect(() => {
+    axios.get("http://localhost:5000/templates").then((res) => {
+      setTemplates(res.data);
+    });
+  }, []);
 
-    if (section) {
-      setRecipe(prev => ({
-        ...prev,
-        [section]: {
-          ...prev[section],
-          [field]: value
-        }
-      }));
-    } else {
-      setRecipe(prev => ({ ...prev, [field]: value }));
-    }
+  const handleTemplateSelect = (templateId) => {
+    const template = templates.find((t) => t.id === parseInt(templateId));
+    setSelectedTemplate(template);
+    setFormData({});
+  };
+
+  const handleChange = (path, type, value) => {
+    let parsedValue = value;
+    if (type === "number") parsedValue = parseFloat(value);
+    if (type === "boolean") parsedValue = value === "true";
+
+    setFormData((prev) => {
+      const updated = { ...prev };
+      let pointer = updated;
+      for (let i = 0; i < path.length - 1; i++) {
+        pointer[path[i]] = pointer[path[i]] || {};
+        pointer = pointer[path[i]];
+      }
+      pointer[path[path.length - 1]] = parsedValue;
+      return updated;
+    });
+  };
+
+  const renderFields = (fields, path = []) => {
+    return fields.map((field, index) => {
+      const fieldPath = [...path, field.key];
+      if (field.type === "group") {
+        return (
+          <div key={index} className="mb-6 border p-4 rounded">
+            <h4 className="font-semibold mb-2">{field.label}</h4>
+            {renderFields(field.fields, fieldPath)}
+          </div>
+        );
+      }
+
+      return (
+        <div key={index} className="mb-4">
+          <label className="block mb-1">{field.label}</label>
+          {field.type === "boolean" ? (
+            <select
+              className="border p-2 rounded w-full"
+              onChange={(e) => handleChange(fieldPath, field.type, e.target.value)}
+            >
+              <option value="false">False</option>
+              <option value="true">True</option>
+            </select>
+          ) : (
+            <input
+              type={field.type}
+              className="border p-2 rounded w-full"
+              onChange={(e) => handleChange(fieldPath, field.type, e.target.value)}
+            />
+          )}
+        </div>
+      );
+    });
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  console.log("Submitting recipe:", recipe); // ✅ ADD THIS LINE
-
-  try {
-    const response = await axios.post("http://localhost:5000/recipe", recipe);
-    alert("Recipe saved successfully!");
-  } catch (error) {
-    console.error("Full Axios error:", error);
-    if (error.response) {
-      console.error("Backend responded with:", error.response.data);
-    } else {
-      console.error("Network or CORS issue:", error.message);
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5000/recipe", {
+        id: recipeId,
+        name: recipeName,
+        templateId: selectedTemplate.id,
+        data: formData,
+      });
+      alert("Recipe saved!");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save recipe.");
     }
-    alert("Failed to save recipe.");
-  }
-};
-
+  };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '600px', margin: 'auto' }}>
-      <h1>Create a Recipe</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Recipe ID:
+    <div className="max-w-3xl mx-auto p-8">
+      <h1 className="text-2xl font-bold mb-6">Create a Recipe</h1>
+
+      <label className="block mb-2">Select Template</label>
+      <select
+        onChange={(e) => handleTemplateSelect(e.target.value)}
+        className="border p-2 rounded mb-4 w-full"
+        defaultValue=""
+      >
+        <option value="" disabled>Select a template...</option>
+        {templates.map((t) => (
+          <option key={t.id} value={t.id}>
+            {t.name}
+          </option>
+        ))}
+      </select>
+
+      {selectedTemplate && (
+        <form onSubmit={handleSubmit}>
+          <label className="block mt-4">Recipe ID</label>
           <input
-            type="text"
-            value={recipe.id}
-            onChange={(e) => handleChange(e, null, 'id')}
+            className="border p-2 rounded w-full mb-4"
+            value={recipeId}
+            onChange={(e) => setRecipeId(e.target.value)}
             required
           />
-        </label>
-        <br /><br />
 
-        <label>
-          Recipe Name:
+          <label className="block">Recipe Name</label>
           <input
-            type="text"
-            value={recipe.name}
-            onChange={(e) => handleChange(e, null, 'name')}
+            className="border p-2 rounded w-full mb-4"
+            value={recipeName}
+            onChange={(e) => setRecipeName(e.target.value)}
             required
           />
-        </label>
-        <br /><br />
 
-        <h3>Water Preparation</h3>
-        <label>
-          Water Volume (L):
-          <input
-            type="number"
-            value={recipe.waterPrep.waterVolume}
-            onChange={(e) => handleChange(e, 'waterPrep', 'waterVolume')}
-          />
-        </label>
-        <br />
-        <label>
-          Preheat Temperature (°C):
-          <input
-            type="number"
-            value={recipe.waterPrep.preheatTemp}
-            onChange={(e) => handleChange(e, 'waterPrep', 'preheatTemp')}
-          />
-        </label>
+          {renderFields(selectedTemplate.fields)}
 
-        <h3>Mixing</h3>
-        <label>
-          Sugar Mass (kg):
-          <input
-            type="number"
-            value={recipe.mixing.sugarMass}
-            onChange={(e) => handleChange(e, 'mixing', 'sugarMass')}
-          />
-        </label>
-        <br />
-        <label>
-          Mixing Time (min):
-          <input
-            type="number"
-            value={recipe.mixing.mixTime}
-            onChange={(e) => handleChange(e, 'mixing', 'mixTime')}
-          />
-        </label>
-
-        <h3>Bottling</h3>
-        <label>
-          Bottle Size (L):
-          <input
-            type="number"
-            value={recipe.bottling.bottleSize}
-            onChange={(e) => handleChange(e, 'bottling', 'bottleSize')}
-          />
-        </label>
-
-        <br /><br />
-        <button type="submit">Save Recipe</button>
-      </form>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            ✅ Save Recipe
+          </button>
+        </form>
+      )}
     </div>
   );
 }
 
-export default App;
+export default RecipeForm;
