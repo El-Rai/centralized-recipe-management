@@ -1,7 +1,7 @@
 // backend/index.js
 const express = require("express");
 const cors = require("cors");
-
+const {Recipe, sequelize} = require("./models/Recipe");
 
 const app = express();
 const port = 5000;
@@ -15,62 +15,59 @@ app.use(express.json());
 let recipes = {};
 
 // Endpoint to store a new recipe
-app.post("/recipe", (req, res) => {
-  const recipe = req.body;
+app.post("/recipe", async (req, res) => {
+  try {
+    const { id, name, waterPrep, mixing, bottling } = req.body;
+    if (!id) return res.status(400).json({ error: "ID is required" });
 
-  if (!recipe.id) {
-    return res.status(400).json({ error: "Recipe ID is required" });
+    await Recipe.create({ id, name, waterPrep, mixing, bottling });
+    res.status(201).json({ message: "Recipe saved successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to save recipe" });
   }
-
-  recipes[recipe.id] = recipe;
-
-  console.log(`Saved recipe: ${recipe.id}`);
-  res.status(201).json({ message: "Recipe saved successfully" });
 });
+
 
 // Get all recipes
-app.get("/recipes", (req, res) => {
-  const allRecipes = Object.entries(recipes).map(([id, recipe]) => ({
-    id,
-    name: recipe.name,
-    waterPrep: recipe.waterPrep,
-    mixing: recipe.mixing,
-    bottling: recipe.bottling,
-  }));
-
-  res.json(allRecipes);
+app.get("/recipes", async (req, res) => {
+  try {
+    const recipes = await Recipe.findAll();
+    res.json(recipes);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch recipes" });
+  }
 });
+
 
 
 // Endpoint to get the full recipe
-app.get("/recipe/:id", (req, res) => {
-  const id = req.params.id;
-  const recipe = recipes[id];
-
-  if (!recipe) {
-    return res.status(404).json({ error: "Recipe not found" });
+app.get("/recipe/:id", async (req, res) => {
+  try {
+    const recipe = await Recipe.findByPk(req.params.id);
+    if (!recipe) return res.status(404).json({ error: "Recipe not found" });
+    res.json(recipe);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch recipe" });
   }
-
-  res.json(recipe);
 });
+
 
 
 
 // Endpoint to get a specific part of the recipe
-app.get("/recipe/:id/section/:machine", (req, res) => {
+app.get("/recipe/:id/section/:machine", async (req, res) => {
   const { id, machine } = req.params;
-  const recipe = recipes[id];
-
-  if (!recipe) {
-    return res.status(404).json({ error: "Recipe not found" });
-  }
-
-  const section = recipe[machine];
-  if (!section) {
+  const recipe = await Recipe.findByPk(id);
+  if (!recipe || !recipe[machine]) {
     return res.status(404).json({ error: `${machine} section not found` });
   }
+  res.json(recipe[machine]);
+});
 
-  res.json(section);
+
+sequelize.sync().then(() => {
+  console.log("Database synced");
 });
 
 
