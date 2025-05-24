@@ -6,6 +6,7 @@ import App from './App';
 import RecipeForm from './RecipeForm';
 import EditRecipe from './EditRecipe';
 import TemplateDesigner from './TemplateDesigner';
+import RecipeDetail from './RecipeDetail';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/new" element={<RecipeForm />} />
         <Route path="/edit/:id" element={<EditRecipe />} />
         <Route path="/template-designer" element={<TemplateDesigner />} />
+        <Route path="/recipe/:id" element={<RecipeDetail />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

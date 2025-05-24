@@ -62,13 +62,17 @@ app.put("/recipe/:id", async (req, res) => {
     const recipe = await Recipe.findByPk(req.params.id);
     if (!recipe) return res.status(404).json({ error: "Not found" });
 
-    await recipe.update(req.body);
-    res.json({ message: "Recipe updated successfully" });
+    await recipe.update({
+      name: req.body.name,
+      data: req.body.data,
+    });
+
+    res.json({ message: "Updated successfully" });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Update failed" });
   }
 });
+
 
 app.delete("/recipe/:id", async (req, res) => {
   try {

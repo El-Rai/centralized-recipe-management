@@ -132,11 +132,18 @@ function App() {
                 <span className="text-sm text-gray-500">({r.id})</span>
               </div>
               <Link
-                to={`/edit/${r.id}`}
-                className="text-blue-600 hover:underline"
-              >
-                Edit
-              </Link>
+  to={`/recipe/${r.id}`}
+  className="text-blue-600 hover:underline mr-2"
+>
+  View
+</Link>
+<Link
+  to={`/edit/${r.id}`}
+  className="text-blue-600 hover:underline"
+>
+  Edit
+</Link>
+
             </li>
           ))}
       </ul>
