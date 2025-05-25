@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "./api";
+
 
 function EditRecipe() {
   const { id } = useParams();
@@ -11,12 +12,12 @@ function EditRecipe() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/recipe/${id}`).then((res) => {
+    api.get(`http://localhost:5000/recipe/${id}`).then((res) => {
       setRecipe(res.data);
       setRecipeName(res.data.name);
       setFormData(res.data.data);
 
-      return axios.get(`http://localhost:5000/templates/${res.data.templateId}`);
+      return api.get(`http://localhost:5000/templates/${res.data.templateId}`);
     }).then((res) => {
       setTemplate(res.data);
     });
@@ -81,7 +82,7 @@ function EditRecipe() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/recipe/${id}`, {
+      await api.put(`http://localhost:5000/recipe/${id}`, {
         name: recipeName,
         data: formData,
       });

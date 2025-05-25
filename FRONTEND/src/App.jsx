@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "./api";
+
 
 function App() {
   const [recipes, setRecipes] = useState([]);
@@ -8,7 +9,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const fetchRecipes = async () => {
-    const res = await axios.get("http://localhost:5000/recipes");
+    const res = await api.get("http://localhost:5000/recipes");
     setRecipes(res.data);
   };
 
@@ -27,7 +28,7 @@ function App() {
 
     try {
       await Promise.all(
-        selectedIds.map((id) => axios.delete(`http://localhost:5000/recipe/${id}`))
+        selectedIds.map((id) => api.delete(`http://localhost:5000/recipe/${id}`))
       );
       setSelectedIds([]);
       fetchRecipes();
@@ -57,7 +58,7 @@ function App() {
     try {
       const importedRecipes = JSON.parse(text);
       for (const recipe of importedRecipes) {
-        await axios.post("http://localhost:5000/recipe", recipe);
+        await api.post("http://localhost:5000/recipe", recipe);
       }
       alert("Recipes imported successfully!");
       fetchRecipes();

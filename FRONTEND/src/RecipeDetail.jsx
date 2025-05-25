@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import api from "./api";
+
 
 function RecipeDetail() {
   const { id } = useParams();
   const [recipe, setRecipe] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/recipe/${id}`).then((res) => {
+    api.get(`http://localhost:5000/recipe/${id}`).then((res) => {
       setRecipe(res.data);
     });
   }, [id]);
@@ -16,7 +17,7 @@ function RecipeDetail() {
     if (!window.confirm("Send this recipe to all machines?")) return;
 
     try {
-      await axios.post(`http://localhost:5000/dispatch/${id}`);
+      await api.post(`http://localhost:5000/dispatch/${id}`);
       alert("✅ Recipe dispatched to machines successfully.");
     } catch (err) {
       console.error(err);

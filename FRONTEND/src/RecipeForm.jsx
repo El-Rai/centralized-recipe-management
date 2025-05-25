@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "./api";
+
 import { useNavigate } from "react-router-dom";
 
 function RecipeForm() {
@@ -11,7 +12,7 @@ function RecipeForm() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get("http://localhost:5000/templates").then((res) => {
+    api.get("http://localhost:5000/templates").then((res) => {
       setTemplates(res.data);
     });
   }, []);
@@ -77,7 +78,7 @@ function RecipeForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/recipe", {
+      await api.post("http://localhost:5000/recipe", {
         id: recipeId,
         name: recipeName,
         templateId: selectedTemplate.id,

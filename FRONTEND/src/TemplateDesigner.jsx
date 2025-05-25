@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "./api";
+
 import { useNavigate } from "react-router-dom";
 
 function TemplateDesigner() {
@@ -32,7 +33,7 @@ function TemplateDesigner() {
 
   const handleSubmit = async () => {
     try {
-      await axios.post("http://localhost:5000/templates", {
+      await api.post("http://localhost:5000/templates", {
         name: templateName,
         fields,
       });
